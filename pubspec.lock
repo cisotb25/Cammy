@@ -159,10 +159,10 @@ packages:
     dependency: "direct main"
     description:
       name: photo_manager_image_provider
-      sha256: bc0b8bf01a4f9e74b2085ed346b6e8bc786b17ab4e1fc568085d4d08f423fca8
+      sha256: b6015b67b32f345f57cf32c126f871bced2501236c405aafaefa885f7c821e4f
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "2.2.0"
   sky_engine:
     dependency: transitive
     description: flutter
