@@ -29,6 +29,24 @@ class _MainLayoutState extends State<MainLayout> {
   List<PhotoItem> _trashList = [];
 
   // --- ACTIONS ---
+  void _handleSwipe(bool isDelete, PhotoItem item) {
+    setState(() {
+      _totalOrganized++;
+      _todayCount++;
+
+      if (isDelete) {
+        _trashList.add(item);
+        _todayTrash++;
+        _totalDeleted++;
+      }
+
+      // Basic logic: if you organize at least 1, the streak is active
+      if (_todayCount == 1) {
+        _streak++;
+      }
+    });
+  }
+
   void _addToTrash(PhotoItem item) {
     setState(() {
       _trashList.add(item);
@@ -44,6 +62,13 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
+  // --- FLASHY'S STATS STATE ---
+  int _totalOrganized = 1067; // Starting with your mockup numbers
+  int _todayCount = 0;
+  int _totalDeleted = 421;
+  int _todayTrash = 0;
+  int _streak = 66;
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
@@ -56,12 +81,18 @@ class _MainLayoutState extends State<MainLayout> {
             PhotoItem(id: '2', color: Colors.blue),
             PhotoItem(id: '3', color: Colors.green),
           ],
-          onSwipeLeft: _addToTrash
+        onSwipeLeft: (item) => _handleSwipe(true, item),
+        onSwipeRight: (item) => _handleSwipe(false, item), // We need to add this!
       ),
-      const StatsScreen(),
+      StatsScreen(
+        streakCount: _streak,
+        totalPhotos: _totalOrganized,
+        todayPhotos: _todayCount,
+        deletedPhotos: _totalDeleted,
+        todayTrash: _todayTrash,
+      ),
       const ProfileScreen(),
     ];
-
     return Scaffold(
       // --- 2. HERE IS THE MISSING APP BAR! ---
       appBar: AppBar(
