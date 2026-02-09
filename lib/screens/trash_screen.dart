@@ -16,66 +16,78 @@ class TrashScreen extends StatelessWidget {
     bool isTrashEmpty = trashItems.isEmpty;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
-        // 1. SizedBox.expand or width: double.infinity ensures content is centered horizontally
         child: SizedBox(
           width: double.infinity,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center, // Force horizontal centering
+            mainAxisAlignment: MainAxisAlignment.start, // Align to top
             children: [
-              // --- 1. The Text ---
+              // 1. Reduced top spacing to move everything "slightly upwards"
+              const SizedBox(height: 40),
+
+              // --- 2. The Text ---
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
                   isTrashEmpty
                       ? "I'm starving!\nGive me something to eat already!"
                       : "You have ${trashItems.length} photos\nready to feed Trashy!",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold), // Made text slightly bigger
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // --- 3. The Mascot ---
+              Image.asset(
+                // Logic kept for when you have the different emotions!
+                isTrashEmpty ? 'assets/images/trashy.png' : 'assets/images/trashy.png',
+                height: 300,
+                fit: BoxFit.contain,
               ),
 
               const SizedBox(height: 30),
 
-              // --- 2. The Mascot ---
-              // REMOVED the Container wrapper that was limiting the size!
-              // Now Trashy can breathe.
-              Image.asset(
-                isTrashEmpty ? 'assets/images/trashy.png' : 'assets/images/trashy.png',
-                height: 350, // Much bigger!
-                fit: BoxFit.contain,
+              // --- 4. The Buttons Area ---
+              // Using Visibility with maintainSize: true keeps the layout stable
+              // so Trashy doesn't "jump" down when the buttons disappear.
+              Visibility(
+                visible: !isTrashEmpty,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: Column(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: onFeedTrashy,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                        elevation: 2,
+                      ),
+                      icon: const Icon(Icons.local_fire_department, color: Colors.white, size: 22),
+                      label: const Text(
+                        "FEED ALL",
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                          "CHECK ITEMS",
+                          style: TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w600)
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
-              const SizedBox(height: 50),
-
-              // --- 3. The Buttons ---
-              if (!isTrashEmpty) ...[
-                ElevatedButton.icon(
-                  onPressed: onFeedTrashy,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    // Bigger button to match the bigger mascot
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  ),
-                  icon: const Icon(Icons.local_fire_department, color: Colors.white, size: 28),
-                  label: const Text(
-                    "FEED ALL",
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () {
-                    // Navigate to the "Check List" screen (Future feature)
-                  },
-                  child: const Text(
-                      "CHECK ITEMS",
-                      style: TextStyle(color: Colors.grey, fontSize: 16)
-                  ),
-                )
-              ]
+              // This pushes the reserved button space up from the bottom nav
+              const Spacer(),
             ],
           ),
         ),
