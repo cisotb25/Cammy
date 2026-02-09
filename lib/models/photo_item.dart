@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class PhotoItem {
   final String id;
-  final Color color; // We keep color for now until we use real files
-  // final String path; // We will uncomment this later for real images
+  final AssetEntity asset; // This is the real file reference
 
-  PhotoItem({required this.id, required this.color});
+  PhotoItem({required this.id, required this.asset});
 }
