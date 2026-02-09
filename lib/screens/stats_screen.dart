@@ -29,10 +29,10 @@ class StatsScreen extends StatelessWidget {
             Text(
               "$streakCount",
               style: const TextStyle(
-                fontSize: 70,
+                fontSize: 75, // Slightly bigger streak number to match mascot
                 fontWeight: FontWeight.bold,
                 color: Colors.orangeAccent,
-                height: 1.0, // Tighter spacing
+                height: 1.0,
               ),
             ),
             const Text(
@@ -40,16 +40,17 @@ class StatsScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2),
             ),
 
-            // --- 2. THE MASCOT ---
+            // --- 2. THE MASCOT (25% Bigger!) ---
             Image.asset(
               'assets/images/flashy.png',
-              height: 160,
-              errorBuilder: (c, o, s) => const Icon(Icons.lightbulb, size: 80, color: Colors.yellow),
+              height: 200, // Increased from 160 to 200
+              fit: BoxFit.contain,
+              errorBuilder: (c, o, s) => const Icon(Icons.lightbulb, size: 100, color: Colors.yellow),
             ),
 
             // --- 3. THE CALENDAR SECTION ---
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0),
+              padding: EdgeInsets.only(top: 15.0, bottom: 8.0),
               child: Text(
                 "Jan 2026",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -57,7 +58,7 @@ class StatsScreen extends StatelessWidget {
             ),
             _buildCalendarGrid(),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
 
             // --- 4. THE STATS GRID ---
             Padding(
@@ -68,7 +69,7 @@ class StatsScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
-                childAspectRatio: 1.8, // Slightly flatter boxes
+                childAspectRatio: 1.8,
                 children: [
                   _statBox("Total pics", totalPhotos.toString()),
                   _statBox("Today's pics", todayPhotos.toString()),
@@ -85,11 +86,10 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
-  // --- CALENDAR BUILDER ---
   Widget _buildCalendarGrid() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 2),
         borderRadius: BorderRadius.circular(15),
@@ -97,29 +97,28 @@ class StatsScreen extends StatelessWidget {
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 31, // January has 31 days
+        itemCount: 31,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 7, // 7 days a week
-          mainAxisSpacing: 5,
-          crossAxisSpacing: 5,
+          crossAxisCount: 7,
+          mainAxisSpacing: 6,
+          crossAxisSpacing: 6,
         ),
         itemBuilder: (context, index) {
           int day = index + 1;
-          // For the prototype, let's highlight days 1 through 15 as "streak days"
           bool isStreakDay = day <= 15;
 
           return Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isStreakDay ? Colors.orangeAccent : Colors.grey[200],
-              borderRadius: BorderRadius.circular(4),
+              color: isStreakDay ? Colors.orangeAccent : Colors.grey[100],
+              borderRadius: BorderRadius.circular(5),
             ),
             child: Text(
               "$day",
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: isStreakDay ? Colors.white : Colors.black54,
+                color: isStreakDay ? Colors.white : Colors.black45,
               ),
             ),
           );
@@ -137,7 +136,7 @@ class StatsScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)),
           Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         ],
       ),
