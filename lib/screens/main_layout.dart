@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/photo_item.dart'; // Import the model
+import '../models/photo_item.dart';
 import 'home_screen.dart';
 import 'trash_screen.dart';
 import 'gallery_screen.dart';
@@ -14,32 +14,31 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 2;
+  int _currentIndex = 2; // Start at Home
 
-  // --- THE STATE ---
-  // This is the "Brain" of the app for now.
-  final List<PhotoItem> _trashList = [];
-
-  // Dummy data for Home Screen
-  final List<PhotoItem> _deck = [
-    PhotoItem(id: '1', color: Colors.red),
-    PhotoItem(id: '2', color: Colors.blue),
-    PhotoItem(id: '3', color: Colors.green),
+  // --- 1. The Titles for each screen (Based on your Mockup) ---
+  final List<String> _titles = [
+    "TRASHY",   // 0
+    "GALLERY",  // 1
+    "CAMMY",    // 2
+    "FLASHY",   // 3
+    "PROFILE",  // 4
   ];
 
+  // --- STATE ---
+  List<PhotoItem> _trashList = [];
+
   // --- ACTIONS ---
-  void _onSwipeLeft(PhotoItem item) {
+  void _addToTrash(PhotoItem item) {
     setState(() {
-      _trashList.add(item); // Add to trash
+      _trashList.add(item);
     });
-    print("Trash now has ${_trashList.length} items");
   }
 
-  void _onFeedTrashy() {
+  void _emptyTrash() {
     setState(() {
-      _trashList.clear(); // Empty the trash!
+      _trashList.clear();
     });
-    // Show a snackbar or popup here later for "YUM!"
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("BURP! Trashy is full.")),
     );
@@ -47,23 +46,46 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // We recreate the list of screens every build to pass the updated data
     final List<Widget> screens = [
-      TrashScreen(
-          trashItems: _trashList,
-          onFeedTrashy: _onFeedTrashy
-      ),
+      TrashScreen(trashItems: _trashList, onFeedTrashy: _emptyTrash),
       const GalleryScreen(),
       HomeScreen(
-          deck: _deck,
-          onSwipeLeft: _onSwipeLeft
+        // Assuming you updated HomeScreen to accept deck/onSwipeLeft
+          deck: [
+            PhotoItem(id: '1', color: Colors.red),
+            PhotoItem(id: '2', color: Colors.blue),
+            PhotoItem(id: '3', color: Colors.green),
+          ],
+          onSwipeLeft: _addToTrash
       ),
       const StatsScreen(),
       const ProfileScreen(),
     ];
 
     return Scaffold(
-      body: screens[_currentIndex], // Display current screen
+      // --- 2. HERE IS THE MISSING APP BAR! ---
+      appBar: AppBar(
+        title: Text(
+          _titles[_currentIndex], // Changes based on the tab!
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0, // Flat style like mockup
+        actions: [
+          // The Settings Icon
+          IconButton(
+            onPressed: () {
+              // We can add settings logic later
+              debugPrint("Settings Clicked");
+            },
+            icon: const Icon(Icons.settings, color: Colors.black),
+          ),
+        ],
+      ),
+
+      body: screens[_currentIndex],
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
