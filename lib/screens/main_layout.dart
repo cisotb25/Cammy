@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/photo_item.dart'; // Import the model
 import 'home_screen.dart';
 import 'trash_screen.dart';
 import 'gallery_screen.dart';
@@ -13,35 +14,60 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 2; // Start at index 2 (Home/Cammy)
+  int _currentIndex = 2;
 
-  final List<Widget> _screens = const [
-    TrashScreen(),    // 0
-    GalleryScreen(),  // 1
-    HomeScreen(),     // 2
-    StatsScreen(),    // 3
-    ProfileScreen(),  // 4
+  // --- THE STATE ---
+  // This is the "Brain" of the app for now.
+  final List<PhotoItem> _trashList = [];
+
+  // Dummy data for Home Screen
+  final List<PhotoItem> _deck = [
+    PhotoItem(id: '1', color: Colors.red),
+    PhotoItem(id: '2', color: Colors.blue),
+    PhotoItem(id: '3', color: Colors.green),
   ];
+
+  // --- ACTIONS ---
+  void _onSwipeLeft(PhotoItem item) {
+    setState(() {
+      _trashList.add(item); // Add to trash
+    });
+    print("Trash now has ${_trashList.length} items");
+  }
+
+  void _onFeedTrashy() {
+    setState(() {
+      _trashList.clear(); // Empty the trash!
+    });
+    // Show a snackbar or popup here later for "YUM!"
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("BURP! Trashy is full.")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("CAMMY"),
-        centerTitle: true,
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
-        ],
+    // We recreate the list of screens every build to pass the updated data
+    final List<Widget> screens = [
+      TrashScreen(
+          trashItems: _trashList,
+          onFeedTrashy: _onFeedTrashy
       ),
-      body: _screens[_currentIndex],
+      const GalleryScreen(),
+      HomeScreen(
+          deck: _deck,
+          onSwipeLeft: _onSwipeLeft
+      ),
+      const StatsScreen(),
+      const ProfileScreen(),
+    ];
+
+    return Scaffold(
+      body: screens[_currentIndex], // Display current screen
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed, // Important for 4+ items
+        onTap: (index) => setState(() => _currentIndex = index),
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: false,
