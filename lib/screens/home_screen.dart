@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   // The Image
                   Image.asset(
-                    _isDone ? 'assets/images/cammy_happy.png' : 'assets/images/cammy_normal.png',
+                    _isDone ? 'assets/images/cammy.png' : 'assets/images/cammy.png',
                     height: 150,
                     // If you don't have the image yet, use this error builder to prevent crash:
                     errorBuilder: (c, o, s) => const Icon(Icons.camera_alt, size: 100, color: Colors.grey),
