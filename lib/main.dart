@@ -13,8 +13,14 @@ class CammyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cammy',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white, // All screens white
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent, // No more tint!
+          elevation: 0,
+          centerTitle: true,
+        ),
       ),
       home: const MainLayout(),
     );
