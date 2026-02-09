@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import '../widgets/photo_card.dart';
+import '../models/photo_item.dart'; // Import the model!
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  // Now we ask for data instead of making it ourselves
+  final List<PhotoItem> deck;
+  final Function(PhotoItem) onSwipeLeft;
+
+  const HomeScreen({
+    super.key,
+    required this.deck,
+    required this.onSwipeLeft
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Dummy data for now
-  List<Color> cards = [Colors.red, Colors.blue, Colors.green, Colors.orange];
+  // We don't need 'List<Color> cards' here anymore, we use 'widget.deck'
 
   // To track if we are done
   bool _isDone = false;
@@ -19,20 +27,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea( // Keeps Cammy from being hidden behind the notch
+      body: SafeArea(
         child: Column(
           children: [
             // --- THE MASCOT AREA ---
             Expanded(
-              flex: 2, // Takes up 2/5 of the screen
+              flex: 2,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // The Image
+                  // The Image (Kept logic same as requested!)
                   Image.asset(
                     _isDone ? 'assets/images/cammy.png' : 'assets/images/cammy.png',
                     height: 150,
-                    // If you don't have the image yet, use this error builder to prevent crash:
                     errorBuilder: (c, o, s) => const Icon(Icons.camera_alt, size: 100, color: Colors.grey),
                   ),
                   const SizedBox(height: 10),
@@ -57,18 +64,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // --- THE SWIPE AREA ---
             Expanded(
-              flex: 3, // Takes up 3/5 of the screen
+              flex: 3,
               child: _isDone
                   ? const Center(child: Text("🎉 All Clean!"))
                   : CardSwiper(
-                cardsCount: cards.length,
+                cardsCount: widget.deck.length, // Use the data from parent
                 numberOfCardsDisplayed: 3,
-                cardBuilder: (context, index, _, __) => PhotoCard(color: cards[index], index: index),
+                cardBuilder: (context, index, _, __) {
+                  // Pass the color from the PhotoItem model
+                  return PhotoCard(
+                      color: widget.deck[index].color,
+                      index: index
+                  );
+                },
                 onSwipe: _onSwipe,
-                isLoop: false, // Don't loop photos, we want to finish them!
+                isLoop: false,
                 onEnd: () {
                   setState(() {
-                    _isDone = true; // Trigger the "Happy Cammy" state
+                    _isDone = true;
                   });
                 },
               ),
@@ -80,7 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool _onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
-    // Logic later: Delete or Keep
+    if (direction == CardSwiperDirection.left) {
+      // 1. Get the item that was swiped
+      PhotoItem swipedItem = widget.deck[previousIndex];
+
+      // 2. Tell MainLayout to put it in the trash
+      widget.onSwipeLeft(swipedItem);
+
+      debugPrint("Swiped Left on Photo #${swipedItem.id}");
+    }
     return true;
   }
 }
