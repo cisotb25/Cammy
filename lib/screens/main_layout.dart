@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/photo_item.dart';
+import '../services/photo_service.dart';
 import 'home_screen.dart';
 import 'trash_screen.dart';
 import 'gallery_screen.dart';
@@ -14,21 +15,55 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 2; // Start at Home
+  int _currentIndex = 2; // Start at Home (Cammy)
 
-  // --- 1. The Titles for each screen (Based on your Mockup) ---
+  // --- 1. Titles for the AppBar ---
   final List<String> _titles = [
-    "TRASHY",   // 0
-    "GALLERY",  // 1
-    "CAMMY",    // 2
-    "FLASHY",   // 3
-    "PROFILE",  // 4
+    "TRASHY",
+    "GALLERY",
+    "CAMMY",
+    "FLASHY",
+    "PROFILE",
   ];
 
-  // --- STATE ---
+  // --- 2. State for Photos ---
+  List<PhotoItem> _deck = [];
   List<PhotoItem> _trashList = [];
+  bool _isLoading = true;
 
-  // --- ACTIONS ---
+  // --- 3. State for Flashy's Stats ---
+  int _totalOrganized = 1067;
+  int _todayCount = 0;
+  int _totalDeleted = 421;
+  int _todayTrash = 0;
+  int _streak = 66;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRealPhotos(); // Fetch photos from Samsung gallery on startup
+  }
+
+  Future<void> _loadRealPhotos() async {
+    setState(() => _isLoading = true); // Show spinner
+
+    try {
+      print("LAYOUT: Calling PhotoService...");
+      final assets = await PhotoService.getRecentPhotos();
+
+      setState(() {
+        _deck = assets.map((asset) => PhotoItem(id: asset.id, asset: asset)).toList();
+        _isLoading = false;
+        print("LAYOUT: Loaded ${_deck.length} photos into deck.");
+      });
+    } catch (e) {
+      print("LAYOUT: Error: $e");
+      setState(() => _isLoading = false);
+    }
+  }
+
+
+  // --- 4. Logic for Swiping ---
   void _handleSwipe(bool isDelete, PhotoItem item) {
     setState(() {
       _totalOrganized++;
@@ -40,16 +75,9 @@ class _MainLayoutState extends State<MainLayout> {
         _totalDeleted++;
       }
 
-      // Basic logic: if you organize at least 1, the streak is active
       if (_todayCount == 1) {
         _streak++;
       }
-    });
-  }
-
-  void _addToTrash(PhotoItem item) {
-    setState(() {
-      _trashList.add(item);
     });
   }
 
@@ -62,27 +90,18 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  // --- FLASHY'S STATS STATE ---
-  int _totalOrganized = 1067; // Starting with your mockup numbers
-  int _todayCount = 0;
-  int _totalDeleted = 421;
-  int _todayTrash = 0;
-  int _streak = 66;
-
   @override
   Widget build(BuildContext context) {
+    // Define the screens inside build so they update when the state changes
     final List<Widget> screens = [
       TrashScreen(trashItems: _trashList, onFeedTrashy: _emptyTrash),
       const GalleryScreen(),
-      HomeScreen(
-        // Assuming you updated HomeScreen to accept deck/onSwipeLeft
-          deck: [
-            PhotoItem(id: '1', color: Colors.red),
-            PhotoItem(id: '2', color: Colors.blue),
-            PhotoItem(id: '3', color: Colors.green),
-          ],
+      _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : HomeScreen(
+        deck: _deck,
         onSwipeLeft: (item) => _handleSwipe(true, item),
-        onSwipeRight: (item) => _handleSwipe(false, item), // We need to add this!
+        onSwipeRight: (item) => _handleSwipe(false, item),
       ),
       StatsScreen(
         streakCount: _streak,
@@ -93,30 +112,30 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       const ProfileScreen(),
     ];
+
     return Scaffold(
-      // --- 2. HERE IS THE MISSING APP BAR! ---
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          _titles[_currentIndex], // Changes based on the tab!
+          _titles[_currentIndex],
           style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0, // Flat style like mockup
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         actions: [
-          // The Settings Icon
           IconButton(
-            onPressed: () {
-              // We can add settings logic later
-              debugPrint("Settings Clicked");
-            },
-            icon: const Icon(Icons.settings, color: Colors.black),
+            onPressed: () => _loadRealPhotos(), // Call your load function again!
+            icon: const Icon(Icons.refresh, color: Colors.black),
           ),
         ],
       ),
-
-      body: screens[_currentIndex],
-
+      body: IndexedStack( // IndexedStack preserves the state of tabs when switching
+        index: _currentIndex,
+        children: screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
