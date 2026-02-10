@@ -70,9 +70,12 @@ class _MainLayoutState extends State<MainLayout> {
       _todayCount++;
 
       if (isDelete) {
+        item.status = PhotoStatus.delete; // NEW: Update the item itself
         _trashList.add(item);
         _todayTrash++;
         _totalDeleted++;
+      } else {
+        item.status = PhotoStatus.keep;   // NEW: Update the item itself
       }
 
       if (_todayCount == 1) {
@@ -95,7 +98,8 @@ class _MainLayoutState extends State<MainLayout> {
     // Define the screens inside build so they update when the state changes
     final List<Widget> screens = [
       TrashScreen(trashItems: _trashList, onFeedTrashy: _emptyTrash),
-      const GalleryScreen(),
+      GalleryScreen(allPhotos: _deck,),
+
       _isLoading
           ? const Center(child: CircularProgressIndicator())
           : HomeScreen(
@@ -155,3 +159,4 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 }
+
