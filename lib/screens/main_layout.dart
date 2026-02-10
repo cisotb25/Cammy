@@ -90,6 +90,21 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
+  // Groups the deck by date for the Gallery
+  Map<DateTime, List<PhotoItem>> get groupedPhotos {
+    Map<DateTime, List<PhotoItem>> groups = {};
+    for (var photo in _deck) {
+      // We normalize the date to just Year-Month-Day so photos from the
+      // same day group together regardless of the hour.
+      DateTime date = DateTime(photo.date.year, photo.date.month, photo.date.day);
+      if (!groups.containsKey(date)) {
+        groups[date] = [];
+      }
+      groups[date]!.add(photo);
+    }
+    return groups;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Define the screens inside build so they update when the state changes
