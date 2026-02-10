@@ -1,3 +1,4 @@
+import 'package:cammy/screens/photo_viewer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import '../widgets/photo_card.dart';
@@ -80,10 +81,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 cardsCount: widget.deck.length,
                 numberOfCardsDisplayed: widget.deck.length >= 3 ? 3 : widget.deck.length,
                 // The Card Builder now passes the real photo asset
-                cardBuilder: (context, index, _, __) {
-                  return PhotoCard(
-                    photoItem: widget.deck[index],
-                    index: index,
+                cardBuilder: (context, index, horizontalOffset, verticalOffset) {
+                  return GestureDetector(
+                    onTap: () {
+                      // Open full screen preview on tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PhotoViewerScreen(asset: widget.deck[index].asset),
+                        ),
+                      );
+                    },
+                    child: PhotoCard(
+                      photoItem: widget.deck[index],
+                      index: index,
+                    ),
                   );
                 },
                 onSwipe: _onSwipe,
