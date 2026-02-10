@@ -45,17 +45,23 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   Future<void> _loadRealPhotos() async {
+    setState(() => _isLoading = true); // Show spinner
+
     try {
+      print("LAYOUT: Calling PhotoService...");
       final assets = await PhotoService.getRecentPhotos();
+
       setState(() {
         _deck = assets.map((asset) => PhotoItem(id: asset.id, asset: asset)).toList();
         _isLoading = false;
+        print("LAYOUT: Loaded ${_deck.length} photos into deck.");
       });
     } catch (e) {
-      debugPrint("Error loading photos: $e");
+      print("LAYOUT: Error: $e");
       setState(() => _isLoading = false);
     }
   }
+
 
   // --- 4. Logic for Swiping ---
   void _handleSwipe(bool isDelete, PhotoItem item) {
@@ -121,8 +127,8 @@ class _MainLayoutState extends State<MainLayout> {
         surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(
-            onPressed: () => debugPrint("Settings Clicked"),
-            icon: const Icon(Icons.settings, color: Colors.black),
+            onPressed: () => _loadRealPhotos(), // Call your load function again!
+            icon: const Icon(Icons.refresh, color: Colors.black),
           ),
         ],
       ),
