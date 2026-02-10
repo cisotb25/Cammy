@@ -70,9 +70,12 @@ class _MainLayoutState extends State<MainLayout> {
       _todayCount++;
 
       if (isDelete) {
+        item.status = PhotoStatus.delete; // NEW: Update the item itself
         _trashList.add(item);
         _todayTrash++;
         _totalDeleted++;
+      } else {
+        item.status = PhotoStatus.keep;   // NEW: Update the item itself
       }
 
       if (_todayCount == 1) {
