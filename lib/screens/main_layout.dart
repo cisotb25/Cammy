@@ -110,7 +110,8 @@ class _MainLayoutState extends State<MainLayout> {
     // Define the screens inside build so they update when the state changes
     final List<Widget> screens = [
       TrashScreen(trashItems: _trashList, onFeedTrashy: _emptyTrash),
-      const GalleryScreen(),
+      GalleryScreen(groupedPhotos: groupedPhotos),
+
       _isLoading
           ? const Center(child: CircularProgressIndicator())
           : HomeScreen(
